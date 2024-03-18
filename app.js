@@ -33,7 +33,7 @@ function aggregateVaultHistory(vaultHistory) {
         const borrowerHistory = vaultHistory[address];
         borrowerHistory.sort((a, b) => a.blockNumber - b.blockNumber); // 按照 blockNumber 排序
 
-        const status = borrowerHistory.filter(entry => entry.operation === 'close').length > borrowerHistory.filter(entry => entry.operation === 'open').length ? 'close' : 'open';
+        const status = borrowerHistory.filter(entry => entry.operation === 'close').length >= borrowerHistory.filter(entry => entry.operation === 'open').length ? 'close' : 'open';
         const adjustEntries = borrowerHistory.filter(entry => entry.operation === 'adjust');
         const lastAdjustEntry = adjustEntries.length > 0 ? adjustEntries[adjustEntries.length - 1] : null; // 获取最后一次adjust操作的记录
 
@@ -101,7 +101,8 @@ app.get('/logs', async (req, res) => {
                             "adjust",
                     debt: new BigNumber(_debt.toString()).div(decimal18).toNumber(),
                     coll: new BigNumber(_coll.toString()).div(decimal18).toNumber(),
-                    blockNumber: log.blockNumber
+                    blockNumber: log.blockNumber,
+                    transactionHash: log.transactionHash, // Include the transaction hash
                 });
             }
         }
